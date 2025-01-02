@@ -11,113 +11,82 @@ using System.Windows.Forms;
 using System.Xml.Linq;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement.StartPanel;
 using Login.VIEW;
+using Login.CONTROLLER;
+using System.Data.SQLite;
 
 namespace Login
 {
     public partial class UPDATE_AKUN : Form
     {
+     
+        private string originalUsername; // Untuk menyimpan username asli
+        private LoginController loginController;
 
-        private string originalUsername;
-
-        public UPDATE_AKUN(string username, string password, string name, string phone, string dob)
+        public UPDATE_AKUN(string username, string password, string name, string phone, string DOB, LoginController loginController)
         {
             InitializeComponent();
 
-            // Set data ke TextBox
+            // Set instance LoginController
+            this.loginController = loginController;
+
+            // Isi kontrol dengan data yang diterima
+            originalUsername = username;
             txtUsername.Text = username;
             txtPassword.Text = password;
             txtName.Text = name;
             txtPhone.Text = phone;
-            txtDOB.Text = dob;
+            txtDOB.Text = DOB;
 
-            // Simpan username asli untuk pencocokan data saat update
-            originalUsername = username;
-        }
-
-
-
-        private void UPDATE_AKUN_Load(object sender, EventArgs e)
-        {
-
-        }
-
-        private void label4_Click(object sender, EventArgs e)
-        {
-
-        }
-
-        private void label6_Click(object sender, EventArgs e)
-        {
-
-        }
-
-        private void label3_Click(object sender, EventArgs e)
-        {
-
-        }
-
-        private void label2_Click(object sender, EventArgs e)
-        {
-
-        }
-
-        private void label5_Click(object sender, EventArgs e)
-        {
 
         }
 
         private void btnUpdateUser_Click(object sender, EventArgs e)
         {
-            try
+            // Ambil data baru dari kontrol
+            string newUsername = txtUsername.Text;
+            string newPassword = txtPassword.Text;
+            string newName = txtName.Text;
+            string newPhone = txtPhone.Text;
+            string newDOB= txtDOB.Text;
+
+            // Validasi input
+            if (string.IsNullOrEmpty(newUsername) || string.IsNullOrEmpty(newPassword))
             {
-                var history = HistoryLogger.LoadHistory();
+                MessageBox.Show("Username and Password cannot be empty!", "Error");
+                return;
+            }// Panggil metode UpdateUser di LoginController
+            bool success = loginController.UpdateUser(newUsername, newPassword, newName, newPhone, newDOB);
 
-                // Update data
-                bool dataUpdated = false;
-                foreach (var entry in history)
+            if (success)
+            {
+                MessageBox.Show("Account updated successfully!", "Success");
+                this.DialogResult = DialogResult.OK; // Beri tanda bahwa data berhasil diperbarui
+                this.Close();
+            }
+            else
+            {
+                MessageBox.Show("Failed to update account.", "Error");
+            }
+
+            // Perbarui data di file riwayat
+            var history = HistoryLogger.LoadHistory();
+
+            for (int i = 0; i < history.Count; i++)
+            {
+                if (history[i][0] == originalUsername) // Cari berdasarkan username asli
                 {
-                    if (entry[0] == originalUsername) // Cocokkan username asli
-                    {
-                        entry[0] = txtUsername.Text;    // Update username
-                        entry[1] = txtPassword.Text;   // Update password
-                        entry[2] = txtName.Text;       // Update name
-                        entry[3] = txtPhone.Text;      // Update phone
-                        entry[4] = txtDOB.Text;        // Update DOB
-                        dataUpdated = true;
-                        break;
-                    }
-                }
-
-                if (dataUpdated)
-                {
-                    // Simpan perubahan
-                    HistoryLogger.SaveHistory(history);
-
-                    // Update data admin jika username/password admin diubah
-                    if (originalUsername == UserData.AdminUsername)
-                    {
-                        UserData.AdminUsername = txtUsername.Text;
-                        UserData.AdminPassword = txtPassword.Text;
-                    }
-
-                    // Tampilkan pesan berhasil
-                    MessageBox.Show("Data berhasil diupdate!", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
-
-                    // Refresh ListView di form sebelumnya
-                    var parentForm = Application.OpenForms["HISTORY_LOGIN"] as HISTORY_LOGIN;
-                    parentForm?.LoadLoginHistory();
-
-                    this.Close();
-                }
-                else
-                {
-                    MessageBox.Show("Data tidak ditemukan untuk diupdate.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    // Perbarui data
+                    history[i] = new string[] { newUsername, newPassword, newName, newPhone, newDOB, DateTime.Now.ToString() };
+                    break;
                 }
             }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Terjadi kesalahan saat menyimpan data: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
+
+            // Simpan kembali ke file
+            HistoryLogger.SaveHistory(history);
+
+            MessageBox.Show("Account updated successfully!", "Success");
+            this.DialogResult = DialogResult.OK; // Beri tanda bahwa data berhasil diperbarui
+            this.Close();
         }
 
 

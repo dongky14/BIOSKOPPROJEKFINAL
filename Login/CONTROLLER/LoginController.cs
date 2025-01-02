@@ -1,54 +1,181 @@
 ﻿using Login.MODEL;
+using Login.MODEL.CONTEXT;
 using Login.MODEL.REPOSITORY;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-
+using System.Windows.Forms;
+using System.Data.SQLite;
 namespace Login.CONTROLLER
 {
     public class LoginController
     {
-        private LoginRepository loginRepository;
+        private LoginRepository _repository;
 
-        public LoginController()
+        // Constructor accepts ApplicationDbContext as parameter
+        public LoginController(ApplicationDbContext context)
         {
-            loginRepository = new LoginRepository();
+            _repository = new LoginRepository(context);
         }
 
-        // Fungsi untuk validasi login
+  
         public bool ValidateLogin(string username, string password)
         {
-            // Memanggil method dari LoginRepository untuk memvalidasi login
-            return loginRepository.ValidateLogin(username, password);
+            try
+            {
+                // Check if username and password are not empty
+                if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(password))
+                {
+                    MessageBox.Show("Username or Password cannot be empty!", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    return false;
+                }
+
+                // Call repository to validate login
+                bool isValid = _repository.ValidateLogin(username, password);
+
+                if (isValid)
+                {
+                    MessageBox.Show("Login successful!", "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
+                else
+                {
+                    MessageBox.Show("Invalid Username or Password!", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                }
+
+                return isValid;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return false;
+            }
         }
 
-        // Fungsi untuk register user baru
-        public bool RegisterUser(string username, string password, string name, string phone, string dob)
+        public bool RegisterUser(string Username, string Password, string Name, string Phone, string DOB)
         {
-            // Memanggil method dari LoginRepository untuk register pengguna baru
-            return loginRepository.RegisterUser(username, password, name, phone, dob);
+            try
+            {
+                // Validate user input
+                if (string.IsNullOrEmpty(Username) || string.IsNullOrEmpty(Password) ||
+                    string.IsNullOrEmpty(Name) || string.IsNullOrEmpty(Phone) || string.IsNullOrEmpty(DOB))
+                {
+                    MessageBox.Show("All fields are required!", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    return false;
+                }
+
+                // Create User object
+                User newUser = new User
+                {
+                    Username = Username,
+                    Password = Password,
+                    Name = Name,
+                    Phone = Phone,
+                    DOB = DOB
+                };
+
+                // Call repository to register user
+                int result = _repository.RegisterUser(newUser);
+
+                if (result > 0)
+                {
+                    MessageBox.Show("User successfully registered!", "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
+                else
+                {
+                    MessageBox.Show("Failed to register user!", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                }
+
+                return result > 0;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return false;
+            }
         }
 
-        // Fungsi untuk mengambil data pengguna
-        public User GetUserData(string username)
+
+        public List<User> GetUserData(string username = null)
         {
-            return loginRepository.GetUserData(username);
+            return _repository.GetUserData(username);
         }
 
-        // Fungsi untuk update data pengguna
-        public bool UpdateUser(string username, string password, string name, string phone, string dob)
+        public bool UpdateUser(string Username, string Password, string Name, string Phone, string DOB)
         {
-            // Memanggil method dari LoginRepository untuk update data pengguna
-            return loginRepository.UpdateUser(username, password, name, phone, dob);
+            try
+            {
+                // Validate user input
+                if (string.IsNullOrEmpty(Username) || string.IsNullOrEmpty(Password) ||
+                    string.IsNullOrEmpty(Name) || string.IsNullOrEmpty(Phone) || string.IsNullOrEmpty(DOB))
+                {
+                    MessageBox.Show("All fields are required!", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    return false;
+                }
+
+                // Create User object
+                User updatedUser = new User
+                {
+                    Username = Username,
+                    Password = Password,
+                    Name = Name,
+                    Phone = Phone,
+                    DOB = DOB
+                };
+
+                // Call repository to update user
+                int result = _repository.UpdateUser(updatedUser);
+
+                if (result > 0)
+                {
+                    MessageBox.Show("User data updated successfully!", "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
+                else
+                {
+                    MessageBox.Show("Failed to update user data!", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                }
+
+                return result > 0;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return false;
+            }
         }
 
-        // Fungsi untuk menghapus data pengguna
-        public bool DeleteUser(string username)
+  
+        public bool DeleteUser(string Username)
         {
-            // Memanggil method dari LoginRepository untuk menghapus data pengguna
-            return loginRepository.DeleteUser(username);
+            try
+            {
+                // Validate username
+                if (string.IsNullOrEmpty(Username))
+                {
+                    MessageBox.Show("Username cannot be empty!", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    return false;
+                }
+
+                // Call repository to delete user
+                int result = _repository.DeleteUser(Username);
+
+                if (result > 0)
+                {
+                    MessageBox.Show("User deleted successfully!", "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
+                else
+                {
+                    MessageBox.Show("Failed to delete user!", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                }
+
+                return result > 0;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return false;
+            }
         }
     }
 }

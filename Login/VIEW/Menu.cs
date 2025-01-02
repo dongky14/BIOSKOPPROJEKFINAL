@@ -1,4 +1,5 @@
-﻿using Login.VIEW;
+﻿using Login.MODEL.CONTEXT;
+using Login.VIEW;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -17,9 +18,9 @@ namespace Login
     public partial class Menu : Form
     {
         private List<Film> films; // Koleksi untuk menyimpan data film
-        
+
         bool sidebarexpand;
-        
+
 
         private bool isAdmin; // Variabel untuk menyimpan status admin
 
@@ -81,10 +82,10 @@ namespace Login
             films = FilmManager.Films;
         }
 
-       
+
 
         // In EDIT_FILM.cs
-        
+
 
 
         private void sidebarTimer_Tick(object sender, EventArgs e)
@@ -198,7 +199,7 @@ namespace Login
 
         private void btnTransaksi_Click(object sender, EventArgs e)
         {
-          
+
             btnHistory.FlatStyle = FlatStyle.Flat;
             btnHistory.FlatAppearance.BorderSize = 0;
             btnHistory.TabStop = false;
@@ -215,7 +216,7 @@ namespace Login
             History historyForm = new History();
             historyForm.AddItemToListView(listItem);
             historyForm.Show();
-            
+
         }
 
         private void Menu_Load(object sender, EventArgs e)
@@ -224,9 +225,10 @@ namespace Login
             if (!isAdmin)
             {
                 btnHistory.Visible = false; // Sembunyikan tombol History
-                btnEditFilm.Visible = false; // Sembunyikan tombol Edit Film
-            } 
-              // Perbarui tampilan UI berdasarkan data terbaru
+                btnEditFilm.Visible = false;
+                btnAkunHistory.Visible = false;// Sembunyikan tombol Edit Film
+            }
+            // Perbarui tampilan UI berdasarkan data terbaru
             foreach (var film in FilmManager.Films)
             {
                 UpdateFilmUI(film);
@@ -250,8 +252,8 @@ namespace Login
             }
             this.Hide();
         }
- 
-  
+
+
 
         private void pictureBoxNorthman_Click(object sender, EventArgs e)
         {
@@ -316,11 +318,11 @@ namespace Login
 
         private void btnLogOut_Click(object sender, EventArgs e)
         {
-           UserData.SaveUserData(); // Simpan data pengguna sebelum logout
-    LoginAdmin.IsAdmin = false;
-    Login loginForm = new Login();
-    loginForm.Show();
-    this.Close();
+            UserData.SaveUserData(); // Simpan data pengguna sebelum logout
+            LoginAdmin.IsAdmin = false;
+            Login loginForm = new Login();
+            loginForm.Show();
+            this.Close();
         }
 
         private void lblFilmTitle_Click(object sender, EventArgs e)
@@ -378,9 +380,13 @@ namespace Login
 
         private void button2_Click(object sender, EventArgs e)
         {
-            HISTORY_LOGIN historyForm = new HISTORY_LOGIN();
-            historyForm.Show();
+            ApplicationDbContext context = new ApplicationDbContext();
+
+            // Create an instance of HISTORY_LOGIN and pass the context
+            HISTORY_LOGIN historyLoginForm = new HISTORY_LOGIN(context);
+
+            // Show the form
+            historyLoginForm.Show();
         }
     }
-
 }

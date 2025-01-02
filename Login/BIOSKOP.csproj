@@ -126,7 +126,6 @@
   <ItemGroup>
     <Compile Include="CONTROLLER\BookingController.cs" />
     <Compile Include="CONTROLLER\LoginController.cs" />
-    <Compile Include="CONTROLLER\MovieController.cs" />
     <Compile Include="MODEL\CONTEXT\ApplicationDbContext.cs" />
     <Compile Include="MODEL\ENTITY\Booking.cs" />
     <Compile Include="MODEL\ENTITY\FILM.cs" />
@@ -135,7 +134,6 @@
     <Compile Include="MODEL\ENTITY\User.cs" />
     <Compile Include="MODEL\REPOSITORY\BookingRepository.cs" />
     <Compile Include="MODEL\REPOSITORY\LoginRepository.cs" />
-    <Compile Include="MODEL\REPOSITORY\MovieRepository.cs" />
     <Compile Include="VIEW\UpdateAkun.cs">
       <SubType>Form</SubType>
     </Compile>

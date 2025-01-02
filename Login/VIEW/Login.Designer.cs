@@ -114,7 +114,7 @@
             this.label1.Size = new System.Drawing.Size(215, 65);
             this.label1.TabIndex = 8;
             this.label1.Text = "SIGN IN";
-            this.label1.Click += new System.EventHandler(this.label1_Click_1);
+
             // 
             // pictureBox5
             // 
@@ -128,7 +128,7 @@
             this.pictureBox5.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
             this.pictureBox5.TabIndex = 11;
             this.pictureBox5.TabStop = false;
-            this.pictureBox5.Click += new System.EventHandler(this.pictureBox5_Click);
+     
             // 
             // checkBox1
             // 

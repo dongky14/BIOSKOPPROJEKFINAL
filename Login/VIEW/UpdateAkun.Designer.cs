@@ -168,7 +168,6 @@
             this.Controls.Add(this.label1);
             this.Name = "UPDATE_AKUN";
             this.Text = "UPDATE_AKUN";
-     
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -181,10 +180,10 @@
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.Label label5;
-        private System.Windows.Forms.TextBox txtUsername;
+        public System.Windows.Forms.TextBox txtUsername;
         private System.Windows.Forms.TextBox txtPhone;
         private System.Windows.Forms.TextBox txtName;
-        private System.Windows.Forms.TextBox txtPassword;
+        public System.Windows.Forms.TextBox txtPassword;
         private System.Windows.Forms.Button btnUpdateUser;
         private System.Windows.Forms.TextBox txtDOB;
     }

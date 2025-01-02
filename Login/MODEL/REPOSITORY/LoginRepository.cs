@@ -1,54 +1,80 @@
 ﻿using System;
-using System.Data.SqlClient;
+using System.Collections.Generic;
+using System.Data.SQLite; // Ganti SqlClient dengan SQLite karena menggunakan SQLite
 using System.Security.Cryptography;
 using System.Text;
+using Login.MODEL.CONTEXT;
+using Login.MODEL.ENTITY; // Ensure this namespace contains User entity model
 
 namespace Login.MODEL.REPOSITORY
 {
     public class LoginRepository
     {
-        private string connectionString = @"D:\PEMROGRAMAN LANJUT\UTS\New folder\BIOSKOP\Database\DbBioskop.db"; // Database connection string.
+        // Declare the connection object
+        private SQLiteConnection _conn;
+
+        // Constructor that accepts DbContext (ApplicationDbContext)
+        public LoginRepository(ApplicationDbContext context)
+        {
+            // Initialize the connection object
+            _conn = context.Conn;
+        }
 
         // Encrypt password with a basic method (replace with stronger encryption if needed)
         private string EncryptPassword(string password)
         {
-            var salt = "*"; // A simple salt or encryption key
-            var combined = password + salt;
-            using (var sha256 = SHA256.Create())
+            using (var rng = new RNGCryptoServiceProvider())
             {
-                byte[] hash = sha256.ComputeHash(Encoding.UTF8.GetBytes(combined));
-                return Convert.ToBase64String(hash);
+                // Generate a random salt
+                byte[] salt = new byte[16];
+                rng.GetBytes(salt);
+
+                // Use PBKDF2 to hash the password with the salt
+                using (var pbkdf2 = new Rfc2898DeriveBytes(password, salt, 10000))
+                {
+                    byte[] hash = pbkdf2.GetBytes(20);
+                    byte[] hashBytes = new byte[36];
+                    Array.Copy(salt, 0, hashBytes, 0, 16);
+                    Array.Copy(hash, 0, hashBytes, 16, 20);
+                    return Convert.ToBase64String(hashBytes);
+                }
             }
         }
 
+
         // Register a new user in the database
-        public bool RegisterUser(string username, string password, string name, string phone, string dob)
+        public int RegisterUser(User user)
         {
+            int result = 0;
+
             try
             {
-                string encryptedPassword = EncryptPassword(password);
+                string encryptedPassword = EncryptPassword(user.Password);
 
-                using (SqlConnection connection = new SqlConnection(connectionString))
+                // Declare SQL query for inserting a new user record
+                string sql = @"INSERT INTO Login (Username, Password, Name, Phone, DOB)
+                               VALUES (@Username, @Password, @Name, @Phone, @DOB)";
+
+                // Create the command object inside a using block
+                using (SQLiteCommand cmd = new SQLiteCommand(sql, _conn))
                 {
-                    string query = "INSERT INTO Users (Username, Password, Name, Phone, DOB) VALUES (@Username, @Password, @Name, @Phone, @DOB)";
-                    SqlCommand cmd = new SqlCommand(query, connection);
-                    cmd.Parameters.AddWithValue("@Username", username);
+                    // Register parameters and set their values
+                    cmd.Parameters.AddWithValue("@Username", user.Username);
                     cmd.Parameters.AddWithValue("@Password", encryptedPassword);
-                    cmd.Parameters.AddWithValue("@Name", name);
-                    cmd.Parameters.AddWithValue("@Phone", phone);
-                    cmd.Parameters.AddWithValue("@DOB", dob);
+                    cmd.Parameters.AddWithValue("@Name", user.Name);
+                    cmd.Parameters.AddWithValue("@Phone", user.Phone);
+                    cmd.Parameters.AddWithValue("@DOB", user.DOB);
 
-                    connection.Open();
-                    int rowsAffected = cmd.ExecuteNonQuery();
-                    return rowsAffected > 0;
+                    // Execute the INSERT command and store the result
+                    result = cmd.ExecuteNonQuery();
                 }
             }
             catch (Exception ex)
             {
-                // Handle exceptions
-                Console.WriteLine($"Error: {ex.Message}");
-                return false;
+                System.Diagnostics.Debug.Print("RegisterUser error: {0}", ex.Message);
             }
+
+            return result;
         }
 
         // Validate login
@@ -58,114 +84,132 @@ namespace Login.MODEL.REPOSITORY
             {
                 string encryptedPassword = EncryptPassword(password);
 
-                using (SqlConnection connection = new SqlConnection(connectionString))
+                // Declare SQL query to validate the user
+                string sql = @"SELECT COUNT(*) FROM Login WHERE Username = @Username AND Password = @Password";
+
+                // Create the command object inside a using block
+                using (SQLiteCommand cmd = new SQLiteCommand(sql, _conn))
                 {
-                    string query = "SELECT COUNT(*) FROM Users WHERE Username = @Username AND Password = @Password";
-                    SqlCommand cmd = new SqlCommand(query, connection);
+                    // Register parameters and set their values
                     cmd.Parameters.AddWithValue("@Username", username);
                     cmd.Parameters.AddWithValue("@Password", encryptedPassword);
 
-                    connection.Open();
-                    int count = (int)cmd.ExecuteScalar();
+                    // Execute the SELECT command and check the result
+                    int count = Convert.ToInt32(cmd.ExecuteScalar());
                     return count > 0;
                 }
             }
             catch (Exception ex)
             {
-                // Handle exceptions
-                Console.WriteLine($"Error: {ex.Message}");
+                System.Diagnostics.Debug.Print("ValidateLogin error: {0}", ex.Message);
                 return false;
             }
         }
 
         // Get user details
-        public User GetUserData(string username)
+        // Get all users or a specific user
+        public List<User> GetUserData(string username = null)
         {
+            var users = new List<User>();
+
             try
             {
-                using (SqlConnection connection = new SqlConnection(connectionString))
+                string sql = string.IsNullOrEmpty(username)
+                    ? "SELECT * FROM Login"
+                    : "SELECT * FROM Login WHERE Username = @Username";
+
+                using (SQLiteCommand cmd = new SQLiteCommand(sql, _conn))
                 {
-                    string query = "SELECT Username, Password, Name, Phone, DOB FROM Users WHERE Username = @Username";
-                    SqlCommand cmd = new SqlCommand(query, connection);
-                    cmd.Parameters.AddWithValue("@Username", username);
-
-                    connection.Open();
-                    SqlDataReader reader = cmd.ExecuteReader();
-
-                    if (reader.Read())
+                    if (!string.IsNullOrEmpty(username))
                     {
-                        return new User
+                        cmd.Parameters.AddWithValue("@Username", username);
+                    }
+
+                    using (SQLiteDataReader reader = cmd.ExecuteReader())
+                    {
+                        while (reader.Read())
                         {
-                            Username = reader["Username"].ToString(),
-                            Password = reader["Password"].ToString(),
-                            Name = reader["Name"].ToString(),
-                            Phone = reader["Phone"].ToString(),
-                            DOB = reader["DOB"].ToString()
-                        };
+                            users.Add(new User
+                            {
+                                Username = reader["Username"].ToString(),
+                                Password = reader["Password"].ToString(),
+                                Name = reader["Name"].ToString(),
+                                Phone = reader["Phone"].ToString(),
+                                DOB = reader["DOB"].ToString()
+                            });
+                        }
                     }
                 }
             }
             catch (Exception ex)
             {
-                // Handle exceptions
-                Console.WriteLine($"Error: {ex.Message}");
+                System.Diagnostics.Debug.Print("GetUserData error: {0}", ex.Message);
             }
 
-            return null;
+            return users;
         }
 
+
         // Update user data
-        public bool UpdateUser(string username, string password, string name, string phone, string dob)
+        public int UpdateUser(User user)
         {
+            int result = 0;
+
             try
             {
-                string encryptedPassword = EncryptPassword(password);
+                string encryptedPassword = EncryptPassword(user.Password);
 
-                using (SqlConnection connection = new SqlConnection(connectionString))
+                // Declare SQL query for updating user data
+                string sql = @"UPDATE Login SET  Username = @Username, Password = @Password, Name = @Name, Phone = @Phone, DOB = @DOB WHERE Username = @Username";
+
+                // Create the command object inside a using block
+                using (SQLiteCommand cmd = new SQLiteCommand(sql, _conn))
                 {
-                    string query = "UPDATE Users SET Password = @Password, Name = @Name, Phone = @Phone, DOB = @DOB WHERE Username = @Username";
-                    SqlCommand cmd = new SqlCommand(query, connection);
-                    cmd.Parameters.AddWithValue("@Username", username);
+                    // Register parameters and set their values
+                    cmd.Parameters.AddWithValue("@Username", user.Username);
                     cmd.Parameters.AddWithValue("@Password", encryptedPassword);
-                    cmd.Parameters.AddWithValue("@Name", name);
-                    cmd.Parameters.AddWithValue("@Phone", phone);
-                    cmd.Parameters.AddWithValue("@DOB", dob);
+                    cmd.Parameters.AddWithValue("@Name", user.Name);
+                    cmd.Parameters.AddWithValue("@Phone", user.Phone);
+                    cmd.Parameters.AddWithValue("@DOB", user.DOB);
 
-                    connection.Open();
-                    int rowsAffected = cmd.ExecuteNonQuery();
-                    return rowsAffected > 0;
+                    // Execute the UPDATE command and store the result
+                    result = cmd.ExecuteNonQuery();
                 }
             }
             catch (Exception ex)
             {
-                // Handle exceptions
-                Console.WriteLine($"Error: {ex.Message}");
-                return false;
+                System.Diagnostics.Debug.Print("UpdateUser error: {0}", ex.Message);
             }
+
+            return result;
         }
 
         // Delete user from database
-        public bool DeleteUser(string username)
+        public int DeleteUser(string username)
         {
+            int result = 0;
+
             try
             {
-                using (SqlConnection connection = new SqlConnection(connectionString))
+                // Declare SQL query for deleting a user record
+                string sql = @"DELETE FROM Login WHERE Username = @Username";
+
+                // Create the command object inside a using block
+                using (SQLiteCommand cmd = new SQLiteCommand(sql, _conn))
                 {
-                    string query = "DELETE FROM Users WHERE Username = @Username";
-                    SqlCommand cmd = new SqlCommand(query, connection);
+                    // Register parameter and set its value
                     cmd.Parameters.AddWithValue("@Username", username);
 
-                    connection.Open();
-                    int rowsAffected = cmd.ExecuteNonQuery();
-                    return rowsAffected > 0;
+                    // Execute the DELETE command and store the result
+                    result = cmd.ExecuteNonQuery();
                 }
             }
             catch (Exception ex)
             {
-                // Handle exceptions
-                Console.WriteLine($"Error: {ex.Message}");
-                return false;
+                System.Diagnostics.Debug.Print("DeleteUser error: {0}", ex.Message);
             }
+
+            return result;
         }
     }
 }

@@ -28,20 +28,11 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.txtNama = new System.Windows.Forms.TextBox();
             this.lvwUser = new System.Windows.Forms.ListView();
             this.btnHapusHistory = new System.Windows.Forms.Button();
-            this.btnSearch = new System.Windows.Forms.Button();
             this.btnUpdateUser = new System.Windows.Forms.Button();
+            this.label1 = new System.Windows.Forms.Label();
             this.SuspendLayout();
-            // 
-            // txtNama
-            // 
-            this.txtNama.Location = new System.Drawing.Point(308, 195);
-            this.txtNama.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
-            this.txtNama.Name = "txtNama";
-            this.txtNama.Size = new System.Drawing.Size(985, 26);
-            this.txtNama.TabIndex = 30;
             // 
             // lvwUser
             // 
@@ -66,19 +57,6 @@
             this.btnHapusHistory.UseVisualStyleBackColor = false;
             this.btnHapusHistory.Click += new System.EventHandler(this.btnHapusHistory_Click);
             // 
-            // btnSearch
-            // 
-            this.btnSearch.BackColor = System.Drawing.Color.Transparent;
-            this.btnSearch.BackgroundImage = global::Login.Properties.Resources.Artboard_18;
-            this.btnSearch.Font = new System.Drawing.Font("Segoe UI Black", 8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.btnSearch.Location = new System.Drawing.Point(1304, 183);
-            this.btnSearch.Name = "btnSearch";
-            this.btnSearch.Size = new System.Drawing.Size(158, 41);
-            this.btnSearch.TabIndex = 27;
-            this.btnSearch.Text = "SEARCH USER";
-            this.btnSearch.UseVisualStyleBackColor = false;
-            this.btnSearch.Click += new System.EventHandler(this.btnSearch_Click);
-            // 
             // btnUpdateUser
             // 
             this.btnUpdateUser.BackColor = System.Drawing.Color.Transparent;
@@ -92,6 +70,18 @@
             this.btnUpdateUser.UseVisualStyleBackColor = false;
             this.btnUpdateUser.Click += new System.EventHandler(this.btnUpdateUser_Click);
             // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.BackColor = System.Drawing.Color.Transparent;
+            this.label1.Font = new System.Drawing.Font("Segoe UI Black", 22F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label1.ForeColor = System.Drawing.SystemColors.ButtonFace;
+            this.label1.Location = new System.Drawing.Point(596, 94);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(383, 60);
+            this.label1.TabIndex = 32;
+            this.label1.Text = "RIWAYAT AKUN";
+            // 
             // HISTORY_LOGIN
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
@@ -99,10 +89,9 @@
             this.BackgroundImage = global::Login.Properties.Resources.p2;
             this.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
             this.ClientSize = new System.Drawing.Size(1517, 968);
+            this.Controls.Add(this.label1);
             this.Controls.Add(this.btnUpdateUser);
-            this.Controls.Add(this.txtNama);
             this.Controls.Add(this.btnHapusHistory);
-            this.Controls.Add(this.btnSearch);
             this.Controls.Add(this.lvwUser);
             this.DoubleBuffered = true;
             this.Name = "HISTORY_LOGIN";
@@ -114,10 +103,9 @@
         }
 
         #endregion
-        private System.Windows.Forms.TextBox txtNama;
         private System.Windows.Forms.Button btnHapusHistory;
-        private System.Windows.Forms.Button btnSearch;
         private System.Windows.Forms.ListView lvwUser;
         private System.Windows.Forms.Button btnUpdateUser;
+        private System.Windows.Forms.Label label1;
     }
 }

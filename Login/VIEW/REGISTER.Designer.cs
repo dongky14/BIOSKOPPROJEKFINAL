@@ -224,7 +224,7 @@
             this.ForeColor = System.Drawing.SystemColors.ControlText;
             this.Name = "REGISTER";
             this.Text = "REGISTER";
-            this.Load += new System.EventHandler(this.REGISTER_Load);
+         
             this.ResumeLayout(false);
             this.PerformLayout();
 

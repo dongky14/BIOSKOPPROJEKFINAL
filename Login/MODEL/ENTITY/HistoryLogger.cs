@@ -25,43 +25,27 @@ namespace Login.MODEL.ENTITY
         public static List<string[]> LoadHistory()
         {
             var history = new List<string[]>();
-
-            try
+            if (File.Exists(historyFilePath))
             {
-                using (StreamReader reader = new StreamReader("login_history.txt"))
+                foreach (var line in File.ReadAllLines(historyFilePath))
                 {
-                    string line;
-                    while ((line = reader.ReadLine()) != null)
-                    {
-                        history.Add(line.Split(','));
-                    }
+                    history.Add(line.Split(':'));
                 }
             }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Failed to load history: {ex.Message}");
-            }
-
             return history;
         }
-
         public static void SaveHistory(List<string[]> history)
         {
-            try
+            using (StreamWriter writer = new StreamWriter(historyFilePath, false)) // Overwrite file
             {
-                using (StreamWriter writer = new StreamWriter("login_history.txt"))
+                foreach (var entry in history)
                 {
-                    foreach (var entry in history)
-                    {
-                        writer.WriteLine(string.Join(",", entry));
-                    }
+                    writer.WriteLine(string.Join(":", entry));
                 }
             }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Failed to save history: {ex.Message}");
-            }
         }
+      
+
 
     }
 

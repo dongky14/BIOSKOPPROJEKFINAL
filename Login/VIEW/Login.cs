@@ -1,4 +1,6 @@
-﻿using Microsoft.VisualBasic.ApplicationServices;
+﻿using Login.CONTROLLER;
+using Login.MODEL.CONTEXT;
+using Microsoft.VisualBasic.ApplicationServices;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -20,11 +22,15 @@ namespace Login
         // Tambahkan admin sebagai default user
         private const string adminUsername = "admin";
         private const string adminPassword = "admin123";
+        private LoginController loginController;
 
+        // Add this context for passing to other forms
+        private ApplicationDbContext _context;
 
         public Login()
         {
             InitializeComponent();
+            _context = new ApplicationDbContext(); // Initialize context
         }
 
         private void Form1_Load(object sender, EventArgs e)
@@ -49,10 +55,13 @@ namespace Login
             {
                 MessageBox.Show("Login successful!", "Success");
 
-                // Add user data to history
+                // Ambil data user dari UserData
                 var userData = UserData.users[username];
+
+                // Tambahkan riwayat login ke file
                 HistoryLogger.AddToHistory(username, userData.Password, userData.Name, userData.Phone, userData.DOB);
 
+                // Buka form Menu
                 Menu menuForm = new Menu(false);
                 menuForm.Show();
                 this.Hide();
@@ -61,8 +70,8 @@ namespace Login
             {
                 MessageBox.Show("Invalid username or password!", "Error");
             }
-        
-    }
+        }
+
         public static class HistoryLogger
         {
             private static string historyFilePath = "login_history.txt";
@@ -88,18 +97,15 @@ namespace Login
                 return history;
             }
         }
-     
 
-        private void label1_Click(object sender, EventArgs e)
+        private void btnLogOut_Click(object sender, EventArgs e)
         {
-
+            // Simpan data pengguna sebelum logout
+            UserData.SaveUserData();
+            Login loginForm = new Login();
+            loginForm.Show();
+            this.Close(); // Menutup form login
         }
-
-        private void label1_Click_1(object sender, EventArgs e)
-        {
-
-        }
-
 
         private void checkBox1_CheckedChanged(object sender, EventArgs e)
         {
@@ -114,18 +120,12 @@ namespace Login
             }
         }
 
-        private void pictureBox5_Click(object sender, EventArgs e)
-        {
-
-        }
-
-
-
         private void linkLabel1_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
         {
-            REGISTER registerForm = new REGISTER();
+            // In your Login form or the form where you're calling the REGISTER form
+            REGISTER registerForm = new REGISTER(_context);  // Pass context to the REGISTER form
             registerForm.Show();
-            this.Hide(); // Sembunyikan form Login
+            this.Hide();  // Hide the current form
         }
     }
 }

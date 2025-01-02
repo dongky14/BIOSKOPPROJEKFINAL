@@ -41,7 +41,7 @@
             this.panel4 = new System.Windows.Forms.Panel();
             this.btnHistory = new System.Windows.Forms.Button();
             this.panel5 = new System.Windows.Forms.Panel();
-            this.button2 = new System.Windows.Forms.Button();
+            this.btnAkunHistory = new System.Windows.Forms.Button();
             this.panel1 = new System.Windows.Forms.Panel();
             this.btnLogOut = new System.Windows.Forms.Button();
             this.sidebarTimer = new System.Windows.Forms.Timer(this.components);
@@ -223,29 +223,29 @@
             // 
             // panel5
             // 
-            this.panel5.Controls.Add(this.button2);
+            this.panel5.Controls.Add(this.btnAkunHistory);
             this.panel5.Location = new System.Drawing.Point(3, 692);
             this.panel5.Name = "panel5";
             this.panel5.Size = new System.Drawing.Size(398, 112);
             this.panel5.TabIndex = 124;
             // 
-            // button2
+            // btnAkunHistory
             // 
-            this.button2.BackColor = System.Drawing.SystemColors.MenuBar;
-            this.button2.BackgroundImage = global::Login.Properties.Resources.pngwing_com;
-            this.button2.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
-            this.button2.FlatAppearance.BorderSize = 0;
-            this.button2.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.button2.Font = new System.Drawing.Font("Segoe UI Black", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.button2.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.button2.Location = new System.Drawing.Point(-264, 3);
-            this.button2.Name = "button2";
-            this.button2.Size = new System.Drawing.Size(600, 45);
-            this.button2.TabIndex = 4;
-            this.button2.Text = "                                                     AKUN HISTORY";
-            this.button2.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.button2.UseVisualStyleBackColor = false;
-            this.button2.Click += new System.EventHandler(this.button2_Click);
+            this.btnAkunHistory.BackColor = System.Drawing.SystemColors.MenuBar;
+            this.btnAkunHistory.BackgroundImage = global::Login.Properties.Resources.pngwing_com;
+            this.btnAkunHistory.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
+            this.btnAkunHistory.FlatAppearance.BorderSize = 0;
+            this.btnAkunHistory.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnAkunHistory.Font = new System.Drawing.Font("Segoe UI Black", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.btnAkunHistory.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.btnAkunHistory.Location = new System.Drawing.Point(-264, 3);
+            this.btnAkunHistory.Name = "btnAkunHistory";
+            this.btnAkunHistory.Size = new System.Drawing.Size(600, 45);
+            this.btnAkunHistory.TabIndex = 4;
+            this.btnAkunHistory.Text = "                                                     AKUN HISTORY";
+            this.btnAkunHistory.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.btnAkunHistory.UseVisualStyleBackColor = false;
+            this.btnAkunHistory.Click += new System.EventHandler(this.button2_Click);
             // 
             // panel1
             // 
@@ -737,7 +737,7 @@
         private System.Windows.Forms.Button btnPilihFilm2;
         private System.Windows.Forms.Button btnPIlihFilm1;
         private System.Windows.Forms.Panel panel5;
-        private System.Windows.Forms.Button button2;
+        private System.Windows.Forms.Button btnAkunHistory;
         private System.Windows.Forms.Panel panel1;
         private System.Windows.Forms.Button btnLogOut;
         private System.Windows.Forms.Panel pnl;
